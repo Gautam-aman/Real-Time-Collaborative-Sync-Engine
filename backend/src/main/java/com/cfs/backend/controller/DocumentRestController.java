@@ -24,7 +24,7 @@ public class DocumentRestController {
 			@PathVariable String id) {
 
 		Document document =
-				documentService.getDocument(id);
+				documentService.getOrCreate(id);
 
 		return SyncResponse.builder()
 				.documentId(id)

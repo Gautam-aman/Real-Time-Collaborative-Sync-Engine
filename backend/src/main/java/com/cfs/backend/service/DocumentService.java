@@ -65,4 +65,8 @@ public class DocumentService {
 
 
 	}
+
+	public Document getOrCreate(String id) {
+		return getDocument(id);
+	}
 }
