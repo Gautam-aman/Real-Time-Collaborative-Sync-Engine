@@ -9,31 +9,71 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class PresenceService {
+
 	private final ConcurrentHashMap<
 			String,
-			Set<String>
-			> onlineUsers = new ConcurrentHashMap<>();
+			ConcurrentHashMap<String,Integer>
+			> onlineUsers =
+			new ConcurrentHashMap<>();
 
-	public void join(String documentId, String userId) {
-		onlineUsers.computeIfAbsent(documentId, k -> new HashSet<>()).add(userId);
+	public void join(
+			String documentId,
+			String userId) {
+
+		onlineUsers
+				.computeIfAbsent(
+						documentId,
+						k -> new ConcurrentHashMap<>()
+				)
+				.merge(
+						userId,
+						1,
+						Integer::sum
+				);
 	}
 
-	public void leave(String documentId, String userId) {
-		Set<String> users =
+	public void leave(
+			String documentId,
+			String userId) {
+
+		ConcurrentHashMap<String,Integer>
+				users =
 				onlineUsers.get(documentId);
 
-		if(users != null) {
+		if(users == null) {
+			return;
+		}
 
-			users.remove(userId);
+		users.computeIfPresent(
+				userId,
+				(u,count) -> {
 
-			if(users.isEmpty()) {
-				onlineUsers.remove(documentId);
-			}
+					if(count <= 1) {
+						return null;
+					}
+
+					return count - 1;
+				}
+		);
+
+		if(users.isEmpty()) {
+
+			onlineUsers.remove(
+					documentId
+			);
 		}
 	}
 
-	public Set<String> getUsers(String documentId) {
-		return onlineUsers.getOrDefault(documentId, Set.of());
+	public Set<String> getUsers(
+			String documentId) {
+
+		return onlineUsers
+				.getOrDefault(
+						documentId,
+						new ConcurrentHashMap<>()
+				)
+				.keySet();
 	}
+
 
 }
