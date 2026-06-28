@@ -4,13 +4,16 @@ package com.cfs.backend.controller;
 import com.cfs.backend.dto.JoinDocumentRequest;
 import com.cfs.backend.dto.OperationResult;
 import com.cfs.backend.dto.PresenceResponse;
+import com.cfs.backend.dto.SessionInfo;
 import com.cfs.backend.model.OperationMessage;
 import com.cfs.backend.dto.SyncResponse;
 import com.cfs.backend.service.DocumentService;
 import com.cfs.backend.service.PresenceService;
+import com.cfs.backend.service.SessionRegistry;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,6 +26,7 @@ public class DocumentController {
 	private final DocumentService documentService;
 	private final SimpMessagingTemplate messagingTemplate;
 	private final PresenceService presenceService;
+	private final SessionRegistry sessionRegistry;
 
 	@MessageMapping("/edit")
 	public void edit(OperationMessage message) {
@@ -39,7 +43,7 @@ public class DocumentController {
 
 
 	@MessageMapping("/join")
-	public void joinDocument(JoinDocumentRequest request) {
+	public void joinDocument(JoinDocumentRequest request , SimpMessageHeaderAccessor  accessor) {
 		presenceService.join(request.getDocumentId(), request.getUserId());
 		PresenceResponse response =
 				PresenceResponse.builder()
@@ -52,6 +56,14 @@ public class DocumentController {
 								)
 						)
 						.build();
+		String sessionId =
+				accessor.getSessionId();
+
+		sessionRegistry.register(sessionId ,  new SessionInfo(
+				request.getUserId(),
+				request.getDocumentId()
+		));
+
 		messagingTemplate.convertAndSend(
 				"/topic/presence/"
 						+ request.getDocumentId(),
