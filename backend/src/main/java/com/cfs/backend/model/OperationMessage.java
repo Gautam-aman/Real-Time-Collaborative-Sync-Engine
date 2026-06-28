@@ -11,8 +11,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OperationMessage {
-	private Long documentId;
-	private Long userId;
+	private String documentId;
+	private String userId;
 
 	private OperationType operation;
 	private Integer position;
