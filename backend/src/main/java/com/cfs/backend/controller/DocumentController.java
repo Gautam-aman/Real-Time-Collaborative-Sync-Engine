@@ -1,6 +1,7 @@
 package com.cfs.backend.controller;
 
 
+import com.cfs.backend.dto.OperationResult;
 import com.cfs.backend.model.OperationMessage;
 import com.cfs.backend.dto.SyncResponse;
 import com.cfs.backend.service.DocumentService;
@@ -21,12 +22,14 @@ public class DocumentController {
 
 	@MessageMapping("/edit")
 	public void edit(OperationMessage message) {
-		SyncResponse response =
-				documentService.applyOperation(message);
+
+		OperationResult result =
+				documentService.processOperation(message);
+
 		messagingTemplate.convertAndSend(
-				"/topic/document/" +
-						message.getDocumentId(),
-				response
+				"/topic/document/"
+						+ message.getDocumentId(),
+				result
 		);
 	}
 
