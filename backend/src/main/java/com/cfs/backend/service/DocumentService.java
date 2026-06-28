@@ -16,7 +16,7 @@ public class DocumentService {
 	private final Map<String, Document> documents =
 			new ConcurrentHashMap<>();
 
-	private Document getDocument(String documentId) {
+	public Document getDocument(String documentId) {
 		if (!documents.containsKey(documentId)) {
 			documents.put(documentId, new Document(documentId));
 		}
