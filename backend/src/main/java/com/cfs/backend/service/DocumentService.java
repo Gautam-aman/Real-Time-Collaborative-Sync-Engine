@@ -6,6 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.cfs.backend.model.Document;
 import com.cfs.backend.model.OperationMessage;
 import com.cfs.backend.model.OperationType;
+import com.cfs.backend.model.SyncResponse;
 
 import org.springframework.stereotype.Service;
 
@@ -22,29 +23,46 @@ public class DocumentService {
 		return documents.get(documentId);
 	}
 
-	public String applyOperation(OperationMessage message) {
+	public SyncResponse applyOperation(OperationMessage message) {
+
 		Document document = getDocument(message.getDocumentId());
 
 		synchronized (document) {
-			StringBuilder content = document.getContent();
+			 if (message.getVersion() != document.getVersion()) {
+				 return SyncResponse.builder()
+						 .documentId(document.getId())
+						 .content(document.getContent().toString())
+						 .version(document.getVersion())
+						 .build();
+			 }
 
-			if (message.getOperation() == OperationType.INSERT) {
-				int position = Math.min(content.length(), message.getPosition());
-				content.insert(position, message.getValue());
-			}
+			 StringBuilder content = document.getContent();
 
-			if (message.getOperation() == OperationType.DELETE) {
-				if (content.length() > 0 && message.getPosition() < content.length()) {
-					content.deleteCharAt(message.getPosition());
-				}
-			}
+			 if (message.getOperation() == OperationType.INSERT){
+				 int position = Math.min(content.length(), message.getPosition());
+				 content.insert(position , message.getValue());
+			 }
 
-			return content.toString();
+			 if (message.getOperation() == OperationType.DELETE){
+				 if(content.length() > 0 &&
+						 message.getPosition()
+								 < content.length()) {
+
+					 content.deleteCharAt(
+							 message.getPosition()
+					 );
+				 }
+			 }
+
+			 document.setVersion(document.getVersion() + 1);
+			 return SyncResponse.builder()
+					 .documentId(document.getId())
+					 .content(document.getContent().toString())
+					 .version(document.getVersion())
+					 .build();
 
 		}
+
+
 	}
-
-
-
-
 }
