@@ -4,6 +4,7 @@ package com.cfs.backend.controller;
 import javax.lang.model.util.SimpleElementVisitor6;
 
 import com.cfs.backend.model.OperationMessage;
+import com.cfs.backend.model.SyncResponse;
 import com.cfs.backend.service.DocumentService;
 import jdk.jfr.Registered;
 import lombok.RequiredArgsConstructor;
@@ -23,8 +24,13 @@ public class DocumentController {
 
 	@MessageMapping("/edit")
 	public void edit(OperationMessage message) {
-		String latestDocument = documentService.applyOperation(message);
-		messagingTemplate.convertAndSend("/topic/document" + message.getDocumentId(), latestDocument);
+		SyncResponse response =
+				documentService.applyOperation(message);
+		messagingTemplate.convertAndSend(
+				"/topic/document/" +
+						message.getDocumentId(),
+				response
+		);
 	}
 
 
