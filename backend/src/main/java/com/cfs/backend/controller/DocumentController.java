@@ -1,10 +1,13 @@
 package com.cfs.backend.controller;
 
 
+import com.cfs.backend.dto.JoinDocumentRequest;
 import com.cfs.backend.dto.OperationResult;
+import com.cfs.backend.dto.PresenceResponse;
 import com.cfs.backend.model.OperationMessage;
 import com.cfs.backend.dto.SyncResponse;
 import com.cfs.backend.service.DocumentService;
+import com.cfs.backend.service.PresenceService;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -19,6 +22,7 @@ public class DocumentController {
 
 	private final DocumentService documentService;
 	private final SimpMessagingTemplate messagingTemplate;
+	private final PresenceService presenceService;
 
 	@MessageMapping("/edit")
 	public void edit(OperationMessage message) {
@@ -30,6 +34,28 @@ public class DocumentController {
 				"/topic/document/"
 						+ message.getDocumentId(),
 				result
+		);
+	}
+
+
+	@MessageMapping("/join")
+	public void joinDocument(JoinDocumentRequest request) {
+		presenceService.join(request.getDocumentId(), request.getUserId());
+		PresenceResponse response =
+				PresenceResponse.builder()
+						.documentId(
+								request.getDocumentId()
+						)
+						.users(
+								presenceService.getUsers(
+										request.getDocumentId()
+								)
+						)
+						.build();
+		messagingTemplate.convertAndSend(
+				"/topic/presence/"
+						+ request.getDocumentId(),
+				response
 		);
 	}
 
