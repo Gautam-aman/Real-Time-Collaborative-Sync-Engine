@@ -13,8 +13,8 @@ import lombok.NoArgsConstructor;
 public class OperationMessage {
 	private String documentId;
 	private String userId;
-
 	private OperationType operation;
 	private Integer position;
 	private String value;
+	private long version;
 }
