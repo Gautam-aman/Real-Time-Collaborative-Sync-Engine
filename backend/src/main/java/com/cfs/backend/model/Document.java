@@ -9,8 +9,11 @@ public class Document {
 
 	private StringBuilder content;
 
+	private long version;
+
 	public Document(String id) {
 		this.id = id;
 		this.content = new StringBuilder();
+		this.version = 0;
 	}
 }
