@@ -18,8 +18,8 @@ public class SessionRegistry {
 		sessions.put(sessionId, sessionInfo);
 	}
 
-	public void remove(String sessionId) {
-		sessions.remove(sessionId);
+	public SessionInfo remove(String sessionId) {
+		return sessions.remove(sessionId);
 	}
 
 	public SessionInfo get(String sessionId) {
