@@ -1,4 +1,4 @@
-package com.cfs.backend.model;
+package com.cfs.backend.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

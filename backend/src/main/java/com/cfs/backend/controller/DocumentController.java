@@ -1,12 +1,9 @@
 package com.cfs.backend.controller;
 
 
-import javax.lang.model.util.SimpleElementVisitor6;
-
 import com.cfs.backend.model.OperationMessage;
-import com.cfs.backend.model.SyncResponse;
+import com.cfs.backend.dto.SyncResponse;
 import com.cfs.backend.service.DocumentService;
-import jdk.jfr.Registered;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.messaging.handler.annotation.MessageMapping;

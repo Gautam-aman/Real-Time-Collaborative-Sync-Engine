@@ -6,7 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.cfs.backend.model.Document;
 import com.cfs.backend.model.OperationMessage;
 import com.cfs.backend.model.OperationType;
-import com.cfs.backend.model.SyncResponse;
+import com.cfs.backend.dto.SyncResponse;
 
 import org.springframework.stereotype.Service;
 

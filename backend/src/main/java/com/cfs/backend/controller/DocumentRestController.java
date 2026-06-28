@@ -2,7 +2,7 @@ package com.cfs.backend.controller;
 
 
 import com.cfs.backend.model.Document;
-import com.cfs.backend.model.SyncResponse;
+import com.cfs.backend.dto.SyncResponse;
 import com.cfs.backend.service.DocumentService;
 import lombok.RequiredArgsConstructor;
 
