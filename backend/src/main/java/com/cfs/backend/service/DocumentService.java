@@ -87,6 +87,13 @@ public class DocumentService {
 				}
 			}
 
+			if(message.getPosition() == -1){
+				return OperationResult.builder()
+						.documentId(message.getDocumentId())
+						.version(document.getVersion())
+						.build();
+			}
+
 			StringBuilder content = document.getContent();
 
 			if (message.getOperation() == OperationType.INSERT) {
@@ -97,13 +104,12 @@ public class DocumentService {
 			}
 
 			if (message.getOperation() == OperationType.DELETE) {
-				if (content.length() > 0 &&
+				if (!content.isEmpty() &&
 				message.getPosition()
 								< content.length()) {
 					content.deleteCharAt(message.getPosition());
 				}
 			}
-
 
 
 			document.getHistory()
@@ -117,6 +123,10 @@ public class DocumentService {
 									.build()
 					);
 			document.setVersion(document.getVersion() + 1);
+
+			if(document.getHistory().size() > 1000){
+				document.getHistory().removeFirst();
+			}
 
 			return OperationResult.builder()
 					.documentId(message.getDocumentId())
