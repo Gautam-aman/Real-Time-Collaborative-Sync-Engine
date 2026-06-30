@@ -74,6 +74,4 @@ public class PresenceService {
 				)
 				.keySet();
 	}
-
-
 }
