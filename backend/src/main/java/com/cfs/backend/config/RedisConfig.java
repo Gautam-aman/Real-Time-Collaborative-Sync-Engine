@@ -1,5 +1,6 @@
 package com.cfs.backend.config;
 
+import com.cfs.backend.Redis.RedisSubscriber;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
@@ -15,6 +16,12 @@ import org.springframework.stereotype.Service;
 
 @Configuration
 public class RedisConfig {
+
+	@Bean
+	public MessageListenerAdapter listenerAdapter(
+			RedisSubscriber subscriber) {
+		return new MessageListenerAdapter(subscriber);
+	}
 
 	@Bean
 	public RedisMessageListenerContainer redisContainer(RedisConnectionFactory factory, MessageListenerAdapter adapter, ChannelTopic topic) {

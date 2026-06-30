@@ -1,9 +1,11 @@
 package com.cfs.backend.controller;
 
 
+import com.cfs.backend.Redis.RedisPublisher;
 import com.cfs.backend.dto.JoinDocumentRequest;
 import com.cfs.backend.dto.OperationResult;
 import com.cfs.backend.dto.PresenceResponse;
+import com.cfs.backend.dto.RedisOperationEvent;
 import com.cfs.backend.dto.SessionInfo;
 import com.cfs.backend.model.OperationMessage;
 import com.cfs.backend.dto.SyncResponse;
@@ -27,6 +29,7 @@ public class DocumentController {
 	private final SimpMessagingTemplate messagingTemplate;
 	private final PresenceService presenceService;
 	private final SessionRegistry sessionRegistry;
+	private final RedisPublisher redisPublisher;
 
 	@MessageMapping("/edit")
 	public void edit(OperationMessage message) {
@@ -34,10 +37,12 @@ public class DocumentController {
 		OperationResult result =
 				documentService.processOperation(message);
 
-		messagingTemplate.convertAndSend(
-				"/topic/document/"
-						+ message.getDocumentId(),
-				result
+		redisPublisher.publish(
+				"document-events",
+				RedisOperationEvent
+						.builder()
+						.operationResult(result)
+						.build()
 		);
 	}
 
