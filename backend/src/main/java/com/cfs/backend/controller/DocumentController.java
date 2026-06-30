@@ -2,11 +2,13 @@ package com.cfs.backend.controller;
 
 
 import com.cfs.backend.Redis.RedisPublisher;
+import com.cfs.backend.dto.DocumentEditEvent;
 import com.cfs.backend.dto.JoinDocumentRequest;
 import com.cfs.backend.dto.OperationResult;
 import com.cfs.backend.dto.PresenceResponse;
 import com.cfs.backend.dto.RedisOperationEvent;
 import com.cfs.backend.dto.SessionInfo;
+import com.cfs.backend.kafka.DocumentEventProducer;
 import com.cfs.backend.model.OperationMessage;
 import com.cfs.backend.dto.SyncResponse;
 import com.cfs.backend.service.DocumentService;
@@ -30,12 +32,25 @@ public class DocumentController {
 	private final PresenceService presenceService;
 	private final SessionRegistry sessionRegistry;
 	private final RedisPublisher redisPublisher;
+	private final DocumentEventProducer producer;
 
 	@MessageMapping("/edit")
 	public void edit(OperationMessage message) {
 
 		OperationResult result =
 				documentService.processOperation(message);
+
+		producer.publish(DocumentEditEvent
+						.builder()
+						.documentId(result.getDocumentId())
+						.userId(result.getUserId())
+						.operation(result.getOperation())
+						.position(result.getPosition())
+						.value(result.getValue())
+						.version(result.getVersion())
+						.timestamp(System.currentTimeMillis())
+						.build()
+		);
 
 		redisPublisher.publish(
 				"document-events",

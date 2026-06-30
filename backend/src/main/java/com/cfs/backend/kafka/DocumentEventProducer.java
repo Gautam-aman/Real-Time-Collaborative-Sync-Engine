@@ -17,7 +17,8 @@ public class DocumentEventProducer {
 
 	public void publish(DocumentEditEvent documentEditEvent) {
 
-
+		kafkaTemplate.send("document-event" , documentEditEvent.getDocumentId() , documentEditEvent);
+		// all events of same doc stay together id
 
 	}
 
