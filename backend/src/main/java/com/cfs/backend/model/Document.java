@@ -14,11 +14,12 @@ public class Document {
 	private StringBuilder content;
 
 	private long version;
-	private List<AppliedOperation> history = new ArrayList<>();
+	private List<AppliedOperation> history ;
 
 	public Document(String id) {
 		this.id = id;
 		this.content = new StringBuilder();
 		this.version = 0;
+		this.history = new ArrayList<>();
 	}
 }

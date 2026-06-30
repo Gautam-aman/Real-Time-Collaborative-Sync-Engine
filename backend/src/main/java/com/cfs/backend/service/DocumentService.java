@@ -3,19 +3,22 @@ package com.cfs.backend.service;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.cfs.backend.dto.AppliedOperation;
 import com.cfs.backend.dto.OperationResult;
 import com.cfs.backend.model.Document;
 import com.cfs.backend.model.OperationMessage;
 import com.cfs.backend.model.OperationType;
 import com.cfs.backend.dto.SyncResponse;
+import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class DocumentService {
 
-	private final Map<String, Document> documents =
-			new ConcurrentHashMap<>();
+	private final Map<String, Document> documents = new ConcurrentHashMap<>();
+	private final OperationTransformService operationTransformService;
 
 	public Document getDocument(String documentId) {
 		if (!documents.containsKey(documentId)) {
@@ -45,7 +48,7 @@ public class DocumentService {
 			 }
 
 			 if (message.getOperation() == OperationType.DELETE){
-				 if(content.length() > 0 &&
+				 if(!content.isEmpty() &&
 						 message.getPosition()
 								 < content.length()) {
 
@@ -75,12 +78,13 @@ public class DocumentService {
 		Document document = getDocument(message.getDocumentId());
 		synchronized (document){
 
-			if(message.getVersion()
-					!= document.getVersion()) {
 
-				throw new RuntimeException(
-						"Version mismatch"
-				);
+			if (message.getVersion() < document.getVersion()) {
+				for(AppliedOperation it : document.getHistory()){
+					if (it.getVersion() > message.getVersion()) {
+						operationTransformService.transform(message,it);
+					}
+				}
 			}
 
 			StringBuilder content = document.getContent();
@@ -101,6 +105,17 @@ public class DocumentService {
 			}
 
 			document.setVersion(document.getVersion() + 1);
+
+			document.getHistory()
+					.add(AppliedOperation
+									.builder()
+									.version(document.getVersion()+1)
+									.operation(message.getOperation())
+									.position(message.getPosition())
+									.value(message.getValue())
+									.userId(message.getUserId())
+									.build()
+					);
 
 			return OperationResult.builder()
 					.documentId(message.getDocumentId())
