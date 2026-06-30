@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class OperationTransformService {
 
-	public void transformInsertAgainInsert(OperationMessage operationMessage , AppliedOperation appliedOperation)
+	public void transformInsertAgainstInsert(OperationMessage operationMessage , AppliedOperation appliedOperation)
 	{
 		if (appliedOperation.getPosition()< operationMessage.getPosition()){
 			operationMessage.setPosition(operationMessage.getPosition()+1);
@@ -20,8 +20,45 @@ public class OperationTransformService {
 	}
 
 	public void transform(OperationMessage incoming, AppliedOperation applied){
-		if (incoming.getOperation() == OperationType.INSERT && applied.getOperation() == OperationType.INSERT){
-			transformInsertAgainInsert(incoming, applied);
+
+		if(incoming.getOperation() == OperationType.INSERT && applied.getOperation() == OperationType.INSERT){
+			transformInsertAgainstInsert(incoming, applied);
+		}
+
+		if(incoming.getOperation() == OperationType.INSERT && applied.getOperation() == OperationType.DELETE){
+			transformInsertAgainstDelete(incoming, applied);
+		}
+
+		if(incoming.getOperation() == OperationType.DELETE && applied.getOperation() == OperationType.INSERT){
+			transformDeleteAgainstInsert(incoming, applied);
+		}
+
+		if(incoming.getOperation() == OperationType.DELETE && applied.getOperation() == OperationType.DELETE){
+			transformDeleteAgainstDelete(incoming, applied);
+		}
+	}
+
+	public void transformInsertAgainstDelete(OperationMessage incoming, AppliedOperation applied){
+		if (applied.getPosition() < incoming.getPosition()){
+			incoming.setPosition(incoming.getPosition()-1);
+		}
+	}
+
+	public void transformDeleteAgainstInsert(OperationMessage incoming, AppliedOperation applied){
+		if (applied.getPosition() < incoming.getPosition()){
+			incoming.setPosition(incoming.getPosition()+1);
+		}
+	}
+
+	private void transformDeleteAgainstDelete(OperationMessage incoming, AppliedOperation applied){
+
+		if (applied.getPosition() == incoming.getPosition()){
+			incoming.setPosition(-1);
+			return;
+		}
+
+		if(applied.getPosition() < incoming.getPosition()){
+			incoming.setPosition(incoming.getPosition()-1);
 		}
 	}
 

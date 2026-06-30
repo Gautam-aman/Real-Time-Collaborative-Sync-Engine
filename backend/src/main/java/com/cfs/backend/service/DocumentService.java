@@ -104,7 +104,7 @@ public class DocumentService {
 				}
 			}
 
-			document.setVersion(document.getVersion() + 1);
+
 
 			document.getHistory()
 					.add(AppliedOperation
@@ -116,6 +116,7 @@ public class DocumentService {
 									.userId(message.getUserId())
 									.build()
 					);
+			document.setVersion(document.getVersion() + 1);
 
 			return OperationResult.builder()
 					.documentId(message.getDocumentId())
