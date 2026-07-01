@@ -35,42 +35,40 @@ public class DocumentService {
 		Document document = getDocument(message.getDocumentId());
 
 		synchronized (document) {
-			 if (message.getVersion() != document.getVersion()) {
-				 return SyncResponse.builder()
-						 .documentId(document.getId())
-						 .content(document.getContent().toString())
-						 .version(document.getVersion())
-						 .build();
-			 }
+			if (message.getVersion() != document.getVersion()) {
+				return SyncResponse.builder()
+						.documentId(document.getId())
+						.content(document.getContent().toString())
+						.version(document.getVersion())
+						.build();
+			}
 
-			 StringBuilder content = document.getContent();
+			StringBuilder content = document.getContent();
 
-			 if (message.getOperation() == OperationType.INSERT){
-				 int position = Math.min(content.length(), message.getPosition());
-				 content.insert(position , message.getValue());
-			 }
+			if (message.getOperation() == OperationType.INSERT) {
+				int position = Math.min(content.length(), message.getPosition());
+				content.insert(position, message.getValue());
+			}
 
-			 if (message.getOperation() == OperationType.DELETE){
-				 if(!content.isEmpty() &&
-						 message.getPosition()
-								 < content.length()) {
+			if (message.getOperation() == OperationType.DELETE) {
+				if (!content.isEmpty() &&
+						message.getPosition()
+								< content.length()) {
 
-					 content.deleteCharAt(
-							 message.getPosition()
-					 );
-				 }
-			 }
+					content.deleteCharAt(
+							message.getPosition()
+					);
+				}
+			}
 
-			 document.setVersion(document.getVersion() + 1);
-			 return SyncResponse.builder()
-					 .documentId(document.getId())
-					 .content(document.getContent().toString())
-					 .version(document.getVersion())
-					 .build();
+			document.setVersion(document.getVersion() + 1);
+			return SyncResponse.builder()
+					.documentId(document.getId())
+					.content(document.getContent().toString())
+					.version(document.getVersion())
+					.build();
 
-		} ̰
-
-
+		}
 	}
 
 	public Document loadDocument(String documentId) {
