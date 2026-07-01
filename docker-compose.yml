@@ -1,13 +1,42 @@
-version: '3'
+version: '3.8'
 
 services:
 
+  postgres:
+
+    image: postgres:16
+
+    container_name: postgres
+
+    environment:
+      POSTGRES_DB: syncengine
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+
+    ports:
+      - "5432:5432"
+
+  redis:
+
+    image: redis:7
+
+    container_name: redis
+
+    ports:
+      - "6379:6379"
+
   zookeeper:
+
     image: confluentinc/cp-zookeeper:7.5.0
+
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
 
+    ports:
+      - "2181:2181"
+
   kafka:
+
     image: confluentinc/cp-kafka:7.5.0
 
     depends_on:
@@ -20,21 +49,21 @@ services:
 
       KAFKA_BROKER_ID: 1
 
-      KAFKA_ZOOKEEPER_CONNECT:
-        zookeeper:2181
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
 
-      KAFKA_ADVERTISED_LISTENERS:
-        PLAINTEXT://localhost:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
 
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
 
-  postgres:
-    image: postgres:16
+  app:
 
-    environment:
-      POSTGRES_DB: syncengine
-      POSTGRES_USER: root
-      POSTGRES_PASSWORD: root
+    build:
+      context: ./backend
+
+    depends_on:
+      - postgres
+      - redis
+      - kafka
 
     ports:
-      - "5432:5432"
+      - "8080:8080"
