@@ -22,6 +22,7 @@ public class DocumentService {
 	private final OperationTransformService operationTransformService;
 	private final SnapshotService snapshotService;
 	private final DocumentSnapshotRepository documentSnapshotRepository;
+	private final RecoveryService recoveryService;
 
 	public Document getDocument(String documentId) {
 		if (!documents.containsKey(documentId)) {
@@ -77,7 +78,7 @@ public class DocumentService {
 				id -> {
 					return documentSnapshotRepository.findById(id)
 							.map(snapshot -> {
-								Document document = new Document(id);
+								Document document = recoveryService.Recover(id);
 								document.getContent().append(snapshot.getContent());
 								document.setVersion(snapshot.getVersion());
 								return document;
