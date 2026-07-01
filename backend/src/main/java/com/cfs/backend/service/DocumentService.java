@@ -3,6 +3,8 @@ package com.cfs.backend.service;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.cfs.backend.cluster.ClusterNode;
+import com.cfs.backend.cluster.ConsistentHashRing;
 import com.cfs.backend.dto.AppliedOperation;
 import com.cfs.backend.dto.OperationResult;
 import com.cfs.backend.model.Document;
@@ -23,6 +25,7 @@ public class DocumentService {
 	private final SnapshotService snapshotService;
 	private final DocumentSnapshotRepository documentSnapshotRepository;
 	private final RecoveryService recoveryService;
+	private final ConsistentHashRing consistentHashRing;
 
 	public Document getDocument(String documentId) {
 		if (!documents.containsKey(documentId)) {
@@ -127,6 +130,7 @@ public class DocumentService {
 				}
 			}
 
+			logOwnership(message.getDocumentId());
 
 			document.getHistory()
 					.add(AppliedOperation
@@ -163,6 +167,15 @@ public class DocumentService {
 					.build();
 
 		}
+	}
+
+	private void logOwnership(String documentId) {
+		ClusterNode owner =
+				consistentHashRing.getOwner(
+						documentId
+				);
+		System.out.println("Document " + documentId + " owned by " + owner.getNodeId()
+		);
 	}
 
 }

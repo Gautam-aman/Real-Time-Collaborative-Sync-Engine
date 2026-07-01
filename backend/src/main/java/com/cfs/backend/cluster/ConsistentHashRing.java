@@ -5,6 +5,7 @@ import java.security.MessageDigest;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import jakarta.annotation.PostConstruct;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
@@ -62,6 +63,27 @@ public class ConsistentHashRing {
 
 		return ring.get(nodeHash);
 
+	}
+
+	@PostConstruct
+	public void init(){
+		addNode(new ClusterNode(
+						"node-1",
+						"localhost:8080"
+				)
+		);
+
+		addNode(new ClusterNode(
+						"node-2",
+						"localhost:8081"
+				)
+		);
+
+		addNode(new ClusterNode(
+						"node-3",
+						"localhost:8082"
+				)
+		);
 	}
 
 }
