@@ -67,19 +67,19 @@ public class ConsistentHashRing {
 	public void init(){
 		addNode(new ClusterNode(
 						"node-1",
-						"localhost:8080"
+						"http://localhost:8080"
 				)
 		);
 
 		addNode(new ClusterNode(
 						"node-2",
-						"localhost:8081"
+						"http://localhost:8081"
 				)
 		);
 
 		addNode(new ClusterNode(
 						"node-3",
-						"localhost:8082"
+						"http://localhost:8082"
 				)
 		);
 	}

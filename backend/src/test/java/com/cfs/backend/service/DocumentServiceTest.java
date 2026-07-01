@@ -1,0 +1,79 @@
+package com.cfs.backend.service;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import com.cfs.backend.cluster.ConsistentHashRing;
+import com.cfs.backend.cluster.ClusterNode;
+import com.cfs.backend.model.Document;
+import com.cfs.backend.model.OperationMessage;
+import com.cfs.backend.model.OperationType;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+@ExtendWith(MockitoExtension.class)
+class DocumentServiceTest {
+
+	@Mock
+	private OperationTransformService operationTransformService;
+
+	@Mock
+	private SnapshotService snapshotService;
+
+	@Mock
+	private RecoveryService recoveryService;
+
+	@Mock
+	private ConsistentHashRing consistentHashRing;
+
+	private DocumentService documentService;
+
+	@BeforeEach
+	void setUp() {
+		documentService = new DocumentService(
+				operationTransformService,
+				snapshotService,
+				recoveryService,
+				consistentHashRing
+		);
+
+		when(consistentHashRing.getOwner("doc-1"))
+				.thenReturn(new ClusterNode("node-1", "http://localhost:8080"));
+	}
+
+	@Test
+	void processOperationReturnsUpdatedVersion() {
+		OperationMessage message = new OperationMessage();
+		message.setDocumentId("doc-1");
+		message.setOperation(OperationType.INSERT);
+		message.setPosition(0);
+		message.setValue("A");
+		message.setUserId("user-1");
+		message.setVersion(0);
+
+		var result = documentService.processOperation(message);
+
+		assertThat(result.getVersion()).isEqualTo(1);
+		assertThat(documentService.getDocument("doc-1").getVersion()).isEqualTo(1);
+		assertThat(documentService.getDocument("doc-1").getContent().toString()).isEqualTo("A");
+	}
+
+	@Test
+	void loadDocumentUsesRecoveredStateWithoutDuplicatingSnapshotContent() {
+		Document recovered = new Document("doc-1");
+		recovered.getContent().append("hello");
+		recovered.setVersion(3);
+
+		when(recoveryService.recover("doc-1")).thenReturn(recovered);
+
+		Document document = documentService.loadDocument("doc-1");
+
+		assertThat(document.getContent().toString()).isEqualTo("hello");
+		assertThat(document.getVersion()).isEqualTo(3);
+		verify(recoveryService).recover("doc-1");
+	}
+}

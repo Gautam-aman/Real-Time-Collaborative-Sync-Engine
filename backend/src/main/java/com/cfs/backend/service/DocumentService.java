@@ -11,7 +11,6 @@ import com.cfs.backend.model.Document;
 import com.cfs.backend.model.OperationMessage;
 import com.cfs.backend.model.OperationType;
 import com.cfs.backend.dto.SyncResponse;
-import com.cfs.backend.repository.DocumentSnapshotRepository;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Service;
@@ -23,7 +22,6 @@ public class DocumentService {
 	private final Map<String, Document> documents = new ConcurrentHashMap<>();
 	private final OperationTransformService operationTransformService;
 	private final SnapshotService snapshotService;
-	private final DocumentSnapshotRepository documentSnapshotRepository;
 	private final RecoveryService recoveryService;
 	private final ConsistentHashRing consistentHashRing;
 
@@ -78,18 +76,7 @@ public class DocumentService {
 	public Document loadDocument(String documentId) {
 		return documents.computeIfAbsent(
 				documentId,
-				id -> {
-					return documentSnapshotRepository.findById(id)
-							.map(snapshot -> {
-								Document document = recoveryService.Recover(id);
-								document.getContent().append(snapshot.getContent());
-								document.setVersion(snapshot.getVersion());
-								return document;
-							})
-							.orElse(
-									new Document(id)
-							);
-				}
+				recoveryService::recover
 		);
 	}
 
@@ -132,24 +119,26 @@ public class DocumentService {
 
 			logOwnership(message.getDocumentId());
 
+			long nextVersion = document.getVersion() + 1;
+
 			document.getHistory()
 					.add(AppliedOperation
 									.builder()
-									.version(document.getVersion()+1)
+									.version(nextVersion)
 									.operation(message.getOperation())
 									.position(message.getPosition())
 									.value(message.getValue())
 									.userId(message.getUserId())
 									.build()
 					);
-			document.setVersion(document.getVersion() + 1);
+			document.setVersion(nextVersion);
+
+			document.setOperationsSinceSnapshot(document.getOperationsSinceSnapshot() + 1);
 
 			if(document.getOperationsSinceSnapshot() >= 100){
 				snapshotService.saveSnapshot(document);
 				document.setOperationsSinceSnapshot(0);
 			}
-
-			document.setOperationsSinceSnapshot(document.getOperationsSinceSnapshot() + 1);
 
 			if(document.getHistory().size() > 1000){
 				document.getHistory().removeFirst();
@@ -162,7 +151,7 @@ public class DocumentService {
 					.operation(message.getOperation())
 					.position(message.getPosition())
 					.value(message.getValue())
-					.version(message.getVersion())
+					.version(document.getVersion())
 					.userId(message.getUserId())
 					.build();
 

@@ -17,9 +17,7 @@ public class RecoveryService {
 	DocumentSnapshotRepository snapshotRepository;
 	private final DocumentEventRepository eventRepository;
 
-
-
-	public Document Recover(String documentId) {
+	public Document recover(String documentId) {
 
 		Document document = new Document(documentId);
 

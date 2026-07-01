@@ -3,14 +3,13 @@ package com.cfs.backend.Redis;
 import com.cfs.backend.dto.RedisOperationEvent;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jspecify.annotations.Nullable;
-import tools.jackson.databind.ObjectMapper;
 
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 @Component
 @RequiredArgsConstructor
