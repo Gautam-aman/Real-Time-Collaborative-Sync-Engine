@@ -15,6 +15,7 @@ import static java.util.Objects.hash;
 @Component
 public class ConsistentHashRing {
 	private final SortedMap<Long, ClusterNode> ring = new TreeMap<>();
+	private static final int VIRTUAL_NODES = 100;
 
 	private long hashFunc(String key){
 		try {
@@ -33,11 +34,20 @@ public class ConsistentHashRing {
 	}
 
 	public void addNode(ClusterNode node){
-		ring.put(hashFunc(node.getNodeId()), node);
+		for(int i=0; i<VIRTUAL_NODES; i++){
+			ring.put(
+					hashFunc(node.getNodeId() + "-" + i),
+					node
+			);
+		}
 	}
 
 	public void removeNode(ClusterNode node){
-		ring.remove(hashFunc(node.getNodeId()));
+		//ring.remove(hashFunc(node.getNodeId()));
+		for(int i=0; i<VIRTUAL_NODES; i++){
+			ring.remove(hashFunc(node.getNodeId() + "-" + i), node
+			);
+		}
 	}
 
 	public ClusterNode getOwner(String documentId){
