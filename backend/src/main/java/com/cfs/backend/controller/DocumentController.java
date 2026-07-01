@@ -2,6 +2,10 @@ package com.cfs.backend.controller;
 
 
 import com.cfs.backend.Redis.RedisPublisher;
+import com.cfs.backend.cluster.ClusterNode;
+import com.cfs.backend.cluster.ClusterProperties;
+import com.cfs.backend.cluster.ConsistentHashRing;
+import com.cfs.backend.cluster.RoutingService;
 import com.cfs.backend.dto.DocumentEditEvent;
 import com.cfs.backend.dto.JoinDocumentRequest;
 import com.cfs.backend.dto.OperationResult;
@@ -33,9 +37,19 @@ public class DocumentController {
 	private final SessionRegistry sessionRegistry;
 	private final RedisPublisher redisPublisher;
 	private final DocumentEventProducer producer;
+	private final ConsistentHashRing consistentHashRing;
+	private final ClusterProperties clusterProperties;
+	private final RoutingService routingService;
 
 	@MessageMapping("/edit")
 	public void edit(OperationMessage message) {
+
+		ClusterNode owner = consistentHashRing.getOwner(message.getDocumentId());
+
+		if(!owner.getNodeId().equals(clusterProperties.getNodeId())){
+			routingService.forwardOperation(owner.getAddress(), message);
+			return;
+		}
 
 		OperationResult result =
 				documentService.processOperation(message);
