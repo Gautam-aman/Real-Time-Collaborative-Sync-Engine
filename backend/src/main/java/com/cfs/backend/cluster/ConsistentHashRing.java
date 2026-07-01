@@ -57,10 +57,8 @@ public class ConsistentHashRing {
 		}
 
 		long hash = hashFunc(documentId);
-		SortedMap<Long,ClusterNode> tailMap = ring.tailMap(hash);
-
+		SortedMap<Long,ClusterNode> tailMap = ring.tailMap(hash); // key >= hash
 		Long nodeHash = tailMap.isEmpty() ? ring.firstKey() : tailMap.firstKey();
-
 		return ring.get(nodeHash);
 
 	}
