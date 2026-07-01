@@ -9,6 +9,7 @@ import com.cfs.backend.model.Document;
 import com.cfs.backend.model.OperationMessage;
 import com.cfs.backend.model.OperationType;
 import com.cfs.backend.dto.SyncResponse;
+import com.cfs.backend.repository.DocumentSnapshotRepository;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Service;
@@ -19,6 +20,8 @@ public class DocumentService {
 
 	private final Map<String, Document> documents = new ConcurrentHashMap<>();
 	private final OperationTransformService operationTransformService;
+	private final SnapshotService snapshotService;
+	private final DocumentSnapshotRepository documentSnapshotRepository;
 
 	public Document getDocument(String documentId) {
 		if (!documents.containsKey(documentId)) {
@@ -65,13 +68,27 @@ public class DocumentService {
 					 .version(document.getVersion())
 					 .build();
 
-		}
+		} ̰
 
 
 	}
 
-	public Document getOrCreate(String id) {
-		return getDocument(id);
+	public Document loadDocument(String documentId) {
+		return documents.computeIfAbsent(
+				documentId,
+				id -> {
+					return documentSnapshotRepository.findById(id)
+							.map(snapshot -> {
+								Document document = new Document(id);
+								document.getContent().append(snapshot.getContent());
+								document.setVersion(snapshot.getVersion());
+								return document;
+							})
+							.orElse(
+									new Document(id)
+							);
+				}
+		);
 	}
 
 	public OperationResult processOperation(OperationMessage message) {
@@ -124,9 +141,18 @@ public class DocumentService {
 					);
 			document.setVersion(document.getVersion() + 1);
 
+			if(document.getOperationsSinceSnapshot() >= 100){
+				snapshotService.saveSnapshot(document);
+				document.setOperationsSinceSnapshot(0);
+			}
+
+			document.setOperationsSinceSnapshot(document.getOperationsSinceSnapshot() + 1);
+
 			if(document.getHistory().size() > 1000){
 				document.getHistory().removeFirst();
 			}
+
+
 
 			return OperationResult.builder()
 					.documentId(message.getDocumentId())

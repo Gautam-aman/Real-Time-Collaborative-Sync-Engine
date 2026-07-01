@@ -67,12 +67,8 @@ public class DocumentController {
 		presenceService.join(request.getDocumentId(), request.getUserId());
 		PresenceResponse response =
 				PresenceResponse.builder()
-						.documentId(
-								request.getDocumentId()
-						)
-						.users(
-								presenceService.getUsers(
-										request.getDocumentId()
+						.documentId(request.getDocumentId())
+						.users(presenceService.getUsers(request.getDocumentId()
 								)
 						)
 						.build();

@@ -15,11 +15,13 @@ public class Document {
 
 	private long version;
 	private List<AppliedOperation> history ;
+	private long operationsSinceSnapshot;
 
 	public Document(String id) {
 		this.id = id;
 		this.content = new StringBuilder();
 		this.version = 0;
 		this.history = new ArrayList<>();
+		this.operationsSinceSnapshot=0;
 	}
 }
