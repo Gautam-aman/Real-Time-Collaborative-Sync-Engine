@@ -27,3 +27,14 @@ services:
         PLAINTEXT://localhost:9092
 
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+  postgres:
+    image: postgres:16
+
+    environment:
+      POSTGRES_DB: syncengine
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+
+    ports:
+      - "5432:5432"
