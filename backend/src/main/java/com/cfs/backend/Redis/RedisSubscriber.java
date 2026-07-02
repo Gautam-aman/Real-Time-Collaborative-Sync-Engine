@@ -4,7 +4,7 @@ import com.cfs.backend.dto.RedisOperationEvent;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.jspecify.annotations.Nullable;
+
 
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
@@ -20,7 +20,7 @@ public class RedisSubscriber implements MessageListener {
 
 
 	@Override
-	public void onMessage(Message message, byte @Nullable [] pattern) {
+	public void onMessage(Message message, byte  [] pattern) {
 		try {
 			String payload = new String(message.getBody());
 			RedisOperationEvent event = mapper.readValue(payload, RedisOperationEvent.class);

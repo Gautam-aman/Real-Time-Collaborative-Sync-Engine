@@ -4,8 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.cfs.backend.cluster.ConsistentHashRing;
 import com.cfs.backend.cluster.ClusterNode;
+import com.cfs.backend.cluster.ConsistentHashRing;
 import com.cfs.backend.model.Document;
 import com.cfs.backend.model.OperationMessage;
 import com.cfs.backend.model.OperationType;
@@ -40,13 +40,14 @@ class DocumentServiceTest {
 				recoveryService,
 				consistentHashRing
 		);
-
-		when(consistentHashRing.getOwner("doc-1"))
-				.thenReturn(new ClusterNode("node-1", "http://localhost:8080"));
 	}
 
 	@Test
 	void processOperationReturnsUpdatedVersion() {
+
+		when(consistentHashRing.getOwner("doc-1"))
+				.thenReturn(new ClusterNode("node-1", "http://localhost:8080"));
+
 		OperationMessage message = new OperationMessage();
 		message.setDocumentId("doc-1");
 		message.setOperation(OperationType.INSERT);
@@ -59,7 +60,8 @@ class DocumentServiceTest {
 
 		assertThat(result.getVersion()).isEqualTo(1);
 		assertThat(documentService.getDocument("doc-1").getVersion()).isEqualTo(1);
-		assertThat(documentService.getDocument("doc-1").getContent().toString()).isEqualTo("A");
+		assertThat(documentService.getDocument("doc-1").getContent().toString())
+				.isEqualTo("A");
 	}
 
 	@Test
@@ -74,6 +76,7 @@ class DocumentServiceTest {
 
 		assertThat(document.getContent().toString()).isEqualTo("hello");
 		assertThat(document.getVersion()).isEqualTo(3);
+
 		verify(recoveryService).recover("doc-1");
 	}
 }

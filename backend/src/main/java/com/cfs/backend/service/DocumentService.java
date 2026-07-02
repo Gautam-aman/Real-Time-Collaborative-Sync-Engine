@@ -141,7 +141,7 @@ public class DocumentService {
 			}
 
 			if(document.getHistory().size() > 1000){
-				document.getHistory().removeFirst();
+				document.getHistory().remove(0);
 			}
 
 
