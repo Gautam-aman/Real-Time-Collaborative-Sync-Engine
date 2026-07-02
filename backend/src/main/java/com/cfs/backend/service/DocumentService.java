@@ -3,6 +3,7 @@ package com.cfs.backend.service;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.cfs.backend.Metrics.MetricsService;
 import com.cfs.backend.cluster.ClusterNode;
 import com.cfs.backend.cluster.ConsistentHashRing;
 import com.cfs.backend.dto.AppliedOperation;
@@ -24,6 +25,7 @@ public class DocumentService {
 	private final SnapshotService snapshotService;
 	private final RecoveryService recoveryService;
 	private final ConsistentHashRing consistentHashRing;
+	private final MetricsService metricsService;
 
 	public Document getDocument(String documentId) {
 		if (!documents.containsKey(documentId)) {
@@ -134,6 +136,8 @@ public class DocumentService {
 			document.setVersion(nextVersion);
 
 			document.setOperationsSinceSnapshot(document.getOperationsSinceSnapshot() + 1);
+			metricsService.incrementOperations();
+			metricsService.setActiveDocuments(documents.size());
 
 			if(document.getOperationsSinceSnapshot() >= 100){
 				snapshotService.saveSnapshot(document);

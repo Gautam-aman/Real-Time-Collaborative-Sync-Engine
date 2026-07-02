@@ -10,22 +10,13 @@ import org.springframework.stereotype.Service;
 @Service
 public class PresenceService {
 
-	private final ConcurrentHashMap<
-			String,
-			ConcurrentHashMap<String,Integer>
-			> onlineUsers =
-			new ConcurrentHashMap<>();
+	private final ConcurrentHashMap<String, ConcurrentHashMap<String,Integer>> onlineUsers = new ConcurrentHashMap<>();
 
 	public void join(
 			String documentId,
 			String userId) {
 
-		onlineUsers
-				.computeIfAbsent(
-						documentId,
-						k -> new ConcurrentHashMap<>()
-				)
-				.merge(
+		onlineUsers.computeIfAbsent(documentId, k -> new ConcurrentHashMap<>()).merge(
 						userId,
 						1,
 						Integer::sum
@@ -62,6 +53,15 @@ public class PresenceService {
 					documentId
 			);
 		}
+	}
+
+	public int totalUsers() {
+
+		return onlineUsers.values().stream()
+				.mapToInt(
+						map -> map.size()
+				)
+				.sum();
 	}
 
 	public Set<String> getUsers(
