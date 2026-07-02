@@ -25,6 +25,13 @@ services:
     ports:
       - "6379:6379"
 
+  grafana:
+
+    image: grafana/grafana
+
+    ports:
+      - "3000:3000"
+
   zookeeper:
 
     image: confluentinc/cp-zookeeper:7.5.0
@@ -34,6 +41,16 @@ services:
 
     ports:
       - "2181:2181"
+
+  prometheus:
+
+    image: prom/prometheus
+
+    ports:
+      - "9090:9090"
+
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
 
   kafka:
 
