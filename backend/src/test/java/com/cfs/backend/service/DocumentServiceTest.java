@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.cfs.backend.Metrics.MetricsService;
 import com.cfs.backend.cluster.ClusterNode;
 import com.cfs.backend.cluster.ConsistentHashRing;
 import com.cfs.backend.model.Document;
@@ -30,6 +31,9 @@ class DocumentServiceTest {
 	@Mock
 	private ConsistentHashRing consistentHashRing;
 
+	@Mock
+	private MetricsService metricsService;
+
 	private DocumentService documentService;
 
 	@BeforeEach
@@ -38,7 +42,8 @@ class DocumentServiceTest {
 				operationTransformService,
 				snapshotService,
 				recoveryService,
-				consistentHashRing
+				consistentHashRing,
+				metricsService
 		);
 	}
 
@@ -47,6 +52,8 @@ class DocumentServiceTest {
 
 		when(consistentHashRing.getOwner("doc-1"))
 				.thenReturn(new ClusterNode("node-1", "http://localhost:8080"));
+
+		when(recoveryService.recover("doc-1")).thenReturn(new Document("doc-1"));
 
 		OperationMessage message = new OperationMessage();
 		message.setDocumentId("doc-1");

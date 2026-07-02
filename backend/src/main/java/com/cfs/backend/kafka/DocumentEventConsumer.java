@@ -21,7 +21,7 @@ public class DocumentEventConsumer {
 		documentEventRepository.save(
 				DocumentEventEntity.builder()
 						.documentId(event.getDocumentId()).userId(event.getUserId())
-						.operation(event.getOperation().name())
+						.operation(event.getOperation() != null ? event.getOperation().name() : null)
 						.position(event.getPosition())
 						.value(event.getValue())
 						.version(event.getVersion())

@@ -12,13 +12,7 @@ import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 public class RedisConfig {
 
 	@Bean
-	public MessageListenerAdapter listenerAdapter(
-			RedisSubscriber subscriber) {
-			return new MessageListenerAdapter(subscriber);
-	}
-
-	@Bean
-	public RedisMessageListenerContainer redisContainer(RedisConnectionFactory factory, MessageListenerAdapter adapter, ChannelTopic topic) {
+	public RedisMessageListenerContainer redisContainer(RedisConnectionFactory factory, RedisSubscriber subscriber, ChannelTopic topic) {
 		RedisMessageListenerContainer
 				container =
 				new RedisMessageListenerContainer();
@@ -28,7 +22,7 @@ public class RedisConfig {
 		);
 
 		container.addMessageListener(
-				adapter,
+				subscriber,
 				topic
 		);
 

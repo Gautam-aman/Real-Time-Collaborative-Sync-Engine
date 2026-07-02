@@ -3,7 +3,7 @@ package com.cfs.backend.cluster;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 import jakarta.annotation.PostConstruct;
 import lombok.Data;
@@ -15,7 +15,7 @@ import static java.util.Objects.hash;
 
 @Component
 public class ConsistentHashRing {
-	private final SortedMap<Long, ClusterNode> ring = new TreeMap<>();
+	private final SortedMap<Long, ClusterNode> ring = new ConcurrentSkipListMap<>();
 	private static final int VIRTUAL_NODES = 100;
 
 	private long hashFunc(String key){

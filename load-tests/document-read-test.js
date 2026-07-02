@@ -9,7 +9,7 @@ export const options = {
 export default function () {
 
     const response = http.get(
-        'http://localhost:8080/documents/1'
+        'http://localhost:8080/document/1'
     );
 
     check(response, {

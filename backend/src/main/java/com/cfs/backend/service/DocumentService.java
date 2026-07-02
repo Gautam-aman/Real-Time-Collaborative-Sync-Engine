@@ -28,10 +28,7 @@ public class DocumentService {
 	private final MetricsService metricsService;
 
 	public Document getDocument(String documentId) {
-		if (!documents.containsKey(documentId)) {
-			documents.put(documentId, new Document(documentId));
-		}
-		return documents.get(documentId);
+		return loadDocument(documentId);
 	}
 
 	public SyncResponse applyOperation(OperationMessage message) {
