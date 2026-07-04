@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: sync-engine
+  namespace: sync-engine
+
+spec:
+
+  replicas: 3
+
+  selector:
+    matchLabels:
+      app: sync-engine
+
+  template:
+
+    metadata:
+      labels:
+        app: sync-engine
+
+    spec:
+
+      containers:
+
+        - name: sync-engine
+
+          image: sync-engine:latest
+
+          imagePullPolicy: Never
+
+          envFrom:
+
+            - configMapRef:
+                name: sync-engine-config
+
+          ports:
+
+            - containerPort: 8080
+
+---
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: sync-engine
+  namespace: sync-engine
+
+spec:
+
+  selector:
+    app: sync-engine
+
+  ports:
+
+    - port: 8080
+      targetPort: 8080
+
+  type: ClusterIP
