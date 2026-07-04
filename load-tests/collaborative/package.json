@@ -9,5 +9,9 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs"
+  "type": "commonjs",
+  "dependencies": {
+    "@stomp/stompjs": "^7.3.0",
+    "sockjs-client": "^1.6.1"
+  }
 }
