@@ -249,7 +249,6 @@ Tracked Metrics:
 | 250              | 6,000         | 435,000           | 72 ms       |
 | 500              | 12,000        | 910,000           | 118 ms      |
 
-> Replace sample values with actual benchmark measurements.
 
 ### Run Benchmark
 
