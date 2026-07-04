@@ -5,9 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="062bb9aa-8cdb-48b2-aa70-36f02392c8b6" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/docs/Screenshot 2026-07-05 at 12.13.36 AM.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/load-tests/results/benchmark-results.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/edit-flow.png.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/load-tests/Spring Boot Statistics rev2.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/Screenshot 2026-07-05 at 12.13.36 AM.png" beforeDir="false" afterPath="$PROJECT_DIR$/docs/architecture.png" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -59,6 +60,7 @@
 }</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/load-tests" />
       <recent name="$PROJECT_DIR$/docs" />
       <recent name="$PROJECT_DIR$" />
     </key>
@@ -93,7 +95,7 @@
       <workItem from="1783015447748" duration="76000" />
       <workItem from="1783178870038" duration="120000" />
       <workItem from="1783184553746" duration="2655000" />
-      <workItem from="1783187601107" duration="3202000" />
+      <workItem from="1783187601107" duration="4263000" />
     </task>
     <servers />
   </component>
