@@ -73,14 +73,41 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
 
   app:
-
     build:
       context: ./backend
-
     depends_on:
       - postgres
       - redis
       - kafka
-
     ports:
       - "8080:8080"
+    extra_hosts:
+      - "localhost:host-gateway"
+
+  app2:
+    build:
+      context: ./backend
+    depends_on:
+      - postgres
+      - redis
+      - kafka
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_PROFILES_ACTIVE=node2
+    extra_hosts:
+      - "localhost:host-gateway"
+
+  app3:
+    build:
+      context: ./backend
+    depends_on:
+      - postgres
+      - redis
+      - kafka
+    ports:
+      - "8082:8082"
+    environment:
+      - SPRING_PROFILES_ACTIVE=node3
+    extra_hosts:
+      - "localhost:host-gateway"

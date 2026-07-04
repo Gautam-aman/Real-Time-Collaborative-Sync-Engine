@@ -44,6 +44,12 @@ public class DocumentController {
 	@MessageMapping("/edit")
 	public void edit(OperationMessage message) {
 
+		System.out.println(
+				"EDIT RECEIVED : "
+						+ message.getDocumentId()
+		);
+
+
 		ClusterNode owner = consistentHashRing.getOwner(message.getDocumentId());
 
 		if(!owner.getNodeId().equals(clusterProperties.getNodeId())){
@@ -64,6 +70,9 @@ public class DocumentController {
 						.version(result.getVersion())
 						.timestamp(System.currentTimeMillis())
 						.build()
+		);
+		System.out.println(
+				result.getDocumentId()
 		);
 
 		redisPublisher.publish(

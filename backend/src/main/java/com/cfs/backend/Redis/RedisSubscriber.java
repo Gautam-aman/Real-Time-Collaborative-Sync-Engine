@@ -22,6 +22,9 @@ public class RedisSubscriber implements MessageListener {
 	@Override
 	public void onMessage(Message message, byte  [] pattern) {
 		try {
+			System.out.println(
+					"REDIS EVENT RECEIVED"
+			);
 			String payload = new String(message.getBody());
 			RedisOperationEvent event = mapper.readValue(payload, RedisOperationEvent.class);
 			messagingTemplate.convertAndSend(
