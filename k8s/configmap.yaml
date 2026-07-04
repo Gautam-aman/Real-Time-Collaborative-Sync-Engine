@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+
+metadata:
+  name: sync-engine-config
+  namespace: sync-engine
+
+data:
+
+  SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/syncengine
+
+  SPRING_DATASOURCE_USERNAME: postgres
+
+  SPRING_DATASOURCE_PASSWORD: postgres
+
+  SPRING_DATA_REDIS_HOST: redis
+
+  SPRING_DATA_REDIS_PORT: "6379"
+
+  SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
