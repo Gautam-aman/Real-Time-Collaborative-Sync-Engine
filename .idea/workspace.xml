@@ -5,10 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="062bb9aa-8cdb-48b2-aa70-36f02392c8b6" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/cfs/backend/Redis/RedisSubscriber.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/cfs/backend/Redis/RedisSubscriber.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/cfs/backend/controller/DocumentController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/cfs/backend/controller/DocumentController.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -93,6 +90,7 @@
       <workItem from="1783015447748" duration="76000" />
       <workItem from="1783178870038" duration="120000" />
       <workItem from="1783184553746" duration="2655000" />
+      <workItem from="1783187601107" duration="594000" />
     </task>
     <servers />
   </component>
