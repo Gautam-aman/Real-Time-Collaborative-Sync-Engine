@@ -1,113 +1,265 @@
 # Real-Time Collaborative Sync Engine
 
-A distributed real-time collaborative editing platform built using Spring Boot, WebSockets, Redis, Kafka, PostgreSQL, Prometheus, and Grafana. The system enables multiple users to edit documents simultaneously while maintaining consistency through Operational Transformation (OT), distributed synchronization, event sourcing, and recovery mechanisms.
+A distributed real-time collaborative editing platform built using Spring Boot, WebSockets, Redis, Kafka, PostgreSQL, Prometheus, and Grafana.
+
+The system enables multiple users to collaboratively edit documents in real time while maintaining consistency through Operational Transformation (OT), distributed synchronization, event sourcing, and snapshot-based recovery.
+
+---
+
+# Architecture Overview
 
 ![Architecture](docs/architecture.png)
 
 ---
 
-## Overview
+# System Architecture
 
-This project simulates the core architecture behind collaborative platforms such as Google Docs and Notion. Multiple users can edit the same document concurrently while the system resolves conflicts, synchronizes updates across nodes, persists events for recovery, and provides real-time visibility through monitoring dashboards.
+```mermaid
+graph TD
+
+    Client[Client Browser]
+
+    Client -->|WebSocket/STOMP| Node1[Spring Boot Node-1]
+    Client -->|WebSocket/STOMP| Node2[Spring Boot Node-2]
+    Client -->|WebSocket/STOMP| Node3[Spring Boot Node-3]
+
+    Node1 <--> Redis[(Redis Pub/Sub)]
+    Node2 <--> Redis
+    Node3 <--> Redis
+
+    Node1 --> Kafka[(Kafka)]
+    Node2 --> Kafka
+    Node3 --> Kafka
+
+    Kafka --> PostgreSQL[(PostgreSQL)]
+
+    Prometheus[Prometheus] --> Grafana[Grafana]
+
+    Node1 --> Prometheus
+    Node2 --> Prometheus
+    Node3 --> Prometheus
+```
 
 ---
 
-## Features
+# Features
 
-### Real-Time Collaboration
+## Real-Time Collaboration
 
 * Multi-user collaborative editing
 * WebSocket + STOMP communication
 * Live document synchronization
-* Presence tracking and active user monitoring
-* Instant update broadcasting
+* Presence tracking
+* Real-time broadcasting
 
-### Consistency & Conflict Resolution
+## Consistency & Conflict Resolution
 
-* Operational Transformation (OT) engine
+* Operational Transformation (OT)
 * Document versioning
 * Concurrent edit handling
-* Conflict resolution workflow
+* Conflict resolution
 
-### Distributed Architecture
+## Distributed Architecture
 
-* Consistent hashing for document ownership
-* Request routing across nodes
-* Redis Pub/Sub for distributed synchronization
-* Horizontal scaling support
+* Consistent hashing
+* Request routing
+* Redis Pub/Sub synchronization
+* Horizontal scalability
 
-### Reliability & Recovery
+## Reliability & Recovery
 
-* Kafka-based event sourcing
+* Kafka event sourcing
 * Snapshot-based recovery
 * Event replay mechanism
-* Fault-tolerant document reconstruction
+* Fault-tolerant reconstruction
 
-### Observability
+## Observability
 
 * Spring Boot Actuator
-* Prometheus metrics collection
+* Prometheus metrics
 * Grafana dashboards
-* Custom business metrics
-
-### DevOps
-
-* Dockerized deployment
-* Docker Compose orchestration
-* Kubernetes manifests included
-* GitHub Actions CI/CD
+* Custom metrics
 
 ---
 
-## Architecture
+# Collaborative Edit Flow
 
-```text
-                    +----------------+
-                    |     Client     |
-                    +----------------+
-                            |
-                    WebSocket/STOMP
-                            |
-        +--------------------------------------+
-        |      Spring Boot Cluster             |
-        |                                      |
-        |  Node-1   Node-2   Node-3           |
-        +--------------------------------------+
-              |          |          |
-              +----------+----------+
-                         |
-                  Redis Pub/Sub
-                         |
-                   Kafka Topic
-                         |
-                    PostgreSQL
+```mermaid
+sequenceDiagram
 
-           Prometheus --------> Grafana
-```
+    participant User
+    participant Node as Spring Boot Node
+    participant OT as OT Engine
+    participant Kafka
+    participant Redis
+    participant Clients
 
-### Edit Flow
+    User->>Node: Send Edit
 
-```text
-User Edit
-    |
-/app/edit
-    |
-Document Controller
-    |
-Operational Transformation
-    |
-Kafka Event Store
-    |
-Redis Pub/Sub
-    |
-WebSocket Broadcast
-    |
-Connected Users
+    Node->>OT: Process Operation
+
+    OT-->>Node: Updated Version
+
+    Node->>Kafka: Store Event
+
+    Node->>Redis: Publish Event
+
+    Redis-->>Clients: Broadcast Update
+
+    Clients-->>User: Document Updated
 ```
 
 ---
 
-## Tech Stack
+# Distributed Request Routing
+
+```mermaid
+flowchart LR
+
+    Edit[Incoming Edit]
+
+    Edit --> Hash[Consistent Hash Ring]
+
+    Hash --> Node1[Node-1]
+    Hash --> Node2[Node-2]
+    Hash --> Node3[Node-3]
+
+    Node1 --> Process[Process Locally]
+    Node2 --> Process
+    Node3 --> Process
+```
+
+### Routing Logic
+
+```text
+Document ID
+     ↓
+Consistent Hash Ring
+     ↓
+Owner Node
+     ↓
+Process Operation
+```
+
+---
+
+# Recovery Mechanism
+
+```mermaid
+flowchart TD
+
+    Edit[Document Edit]
+        --> Kafka[(Kafka Event Store)]
+
+    Kafka
+        --> Snapshotter[Snapshot Service]
+
+    Snapshotter
+        --> Postgres[(PostgreSQL Snapshot)]
+
+    Crash[Node Crash]
+        --> Recovery[Recovery Service]
+
+    Recovery
+        --> Postgres
+
+    Recovery
+        --> Kafka
+
+    Postgres
+        --> Restore[Load Latest Snapshot]
+
+    Kafka
+        --> Replay[Replay Missing Events]
+
+    Restore
+        --> Rebuild[Reconstruct Document]
+
+    Replay
+        --> Rebuild
+
+    Rebuild
+        --> Ready[Document Restored]
+```
+
+### Example Recovery
+
+```text
+Latest Snapshot Version = 100
+
+Kafka Events:
+101
+102
+103
+104
+
+Node Crash
+
+Recovery:
+Load Snapshot(100)
+Replay(101-104)
+
+Final Version = 104
+```
+
+---
+
+# Monitoring
+
+![Grafana Dashboard](docs/grafana-dashboard.png)
+
+```mermaid
+graph LR
+
+    App[Spring Boot Nodes]
+
+    App --> Metrics[Actuator Metrics]
+
+    Metrics --> Prometheus[Prometheus]
+
+    Prometheus --> Grafana[Grafana Dashboard]
+```
+
+Metrics exposed via:
+
+```text
+/actuator/prometheus
+```
+
+Tracked Metrics:
+
+* Active users
+* Active documents
+* Operations processed
+* JVM memory
+* CPU utilization
+* WebSocket connections
+
+---
+
+# Load Testing
+
+![Load Testing Results](docs/load-test-results.png)
+
+## Sample Benchmark Results
+
+| Concurrent Users | Messages Sent | Messages Received | Avg Latency |
+| ---------------- | ------------- | ----------------- | ----------- |
+| 100              | 2,400         | 170,407           | 45 ms       |
+| 250              | 6,000         | 435,000           | 72 ms       |
+| 500              | 12,000        | 910,000           | 118 ms      |
+
+> Replace sample values with actual benchmark measurements.
+
+### Run Benchmark
+
+```bash
+node load-tests/collaborative/collab-edit-test.js
+```
+
+---
+
+# Tech Stack
 
 ### Backend
 
@@ -141,80 +293,36 @@ Connected Users
 ### Testing
 
 * k6
-* Custom WebSocket Load Testing Suite
+* Custom Collaborative Load Testing
 
 ---
 
-## Project Structure
+# Project Structure
 
 ```text
 backend/
-│
-├── src/
-├── Dockerfile
-├── pom.xml
-│
 docs/
-│
-├── architecture.png
-├── grafana-dashboard.png
-└── load-test-results.png
-│
 load-tests/
-│
-├── collaborative/
-│   └── collab-edit-test.js
-│
-├── results/
-│   └── benchmark-results.md
-│
-├── document-read-test.js
-└── document-write-test.js
-│
 k8s/
-│
 docker-compose.yml
 README.md
 ```
 
 ---
 
-## Running Locally
-
-### Clone Repository
-
-```bash
-git clone https://github.com/Gautam-aman/Real-Time-Collaborative-Sync-Engine
-cd sync-engine
-```
-
-### Start Infrastructure
+# Running Locally
 
 ```bash
 docker compose up -d
-```
 
-### Start Node 1
-
-```bash
 mvn spring-boot:run -Dspring-boot.run.profiles=node1
-```
-
-### Start Node 2
-
-```bash
 mvn spring-boot:run -Dspring-boot.run.profiles=node2
-```
-
-### Start Node 3
-
-```bash
 mvn spring-boot:run -Dspring-boot.run.profiles=node3
 ```
 
 ---
 
-## Services
+# Services
 
 | Service     | URL                                         |
 | ----------- | ------------------------------------------- |
@@ -225,118 +333,32 @@ mvn spring-boot:run -Dspring-boot.run.profiles=node3
 
 ---
 
-## Monitoring
+# Future Improvements
 
-![Grafana Dashboard](docs/grafana-dashboard.png)
-
-Metrics exposed through:
-
-```text
-/actuator/prometheus
-```
-
-Tracked metrics:
-
-* Active users
-* Active documents
-* Operations processed
-* WebSocket connections
-* JVM memory usage
-* CPU utilization
-
----
-
-## Load Testing
-
-![Load Test Results](docs/load-test-results.png)
-
-Custom collaborative editing benchmark:
-
-### Sample Results
-
-| Concurrent Users | Messages Sent | Messages Received | Avg Latency |
-| ---------------- | ------------- | ----------------- | ----------- |
-| 100              | 2,400         | 170,407           | 45 ms       |
-| 250              | 6,000         | 435,000           | 72 ms       |
-| 500              | 12,000        | 910,000           | 118 ms      |
-
-
-
-### Run Benchmark
-
-```bash
-node load-tests/collaborative/collab-edit-test.js
-```
-
----
-
-## Key Components
-
-### Operational Transformation Engine
-
-Handles concurrent edits while maintaining document consistency across all connected clients.
-
-### Redis Pub/Sub
-
-Enables distributed synchronization and cross-node event propagation.
-
-### Kafka Event Sourcing
-
-Stores document operations for replay, recovery, and auditing.
-
-### Snapshot Recovery
-
-Reduces replay overhead by periodically persisting document state.
-
-### Consistent Hashing
-
-Distributes document ownership across nodes and enables scalable request routing.
-
----
-
-## CI/CD
-
-GitHub Actions automatically:
-
-* Build project
-* Run tests
-* Validate codebase
-* Package application
-
-Workflow location:
-
-```text
-.github/workflows/build.yml
-```
-
----
-
-## Future Improvements
-
-* CRDT-based synchronization engine
+* CRDT-based synchronization
 * Leader election and failover
 * Dynamic service discovery
 * Authentication & authorization
 * Multi-region deployment
-* Automatic scaling policies
+* Auto-scaling
 * Advanced conflict resolution
 
 ---
 
-## Learning Outcomes
+# Learning Outcomes
 
 * Distributed Systems Design
-* Real-Time Communication
 * Event-Driven Architecture
 * Operational Transformation
 * Kafka Event Sourcing
 * Redis Distributed Messaging
-* Performance Engineering
+* WebSocket Communication
 * Observability & Monitoring
-* Containerization & Deployment
+* Performance Engineering
+* Docker & Kubernetes
+* Load Testing & Benchmarking
 
----
 
-## License
+# License
 
 This project is intended for learning, experimentation, and demonstrating distributed systems concepts.
