@@ -15,7 +15,9 @@ public class OperationTransformService {
 	public void transformInsertAgainstInsert(OperationMessage operationMessage , AppliedOperation appliedOperation)
 	{
 		if (appliedOperation.getPosition() <= operationMessage.getPosition()){
-			operationMessage.setPosition(operationMessage.getPosition()+1);
+			int insertedLength = appliedOperation.getValue().length();
+			operationMessage.setPosition(insertedLength + operationMessage.getPosition());
+			//operationMessage.setPosition(operationMessage.getPosition()+1);
 		}
 	}
 
@@ -46,7 +48,9 @@ public class OperationTransformService {
 
 	public void transformDeleteAgainstInsert(OperationMessage incoming, AppliedOperation applied){
 		if (applied.getPosition() < incoming.getPosition()){
-			incoming.setPosition(incoming.getPosition()+1);
+			int insertedLength = applied.getValue().length();
+			incoming.setPosition(incoming.getPosition() + insertedLength);
+			//incoming.setPosition(incoming.getPosition()+1);
 		}
 	}
 
