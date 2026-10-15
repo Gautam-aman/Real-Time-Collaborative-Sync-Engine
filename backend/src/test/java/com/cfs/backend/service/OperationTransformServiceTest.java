@@ -58,6 +58,25 @@ class OperationTransformServiceTest {
         assertThat(incoming.getPosition()).isEqualTo(5);
     }
 
+    @Test
+    void shouldMakeDuplicateDeleteANoop() {
+        AppliedOperation applied = AppliedOperation.builder()
+                .operation(OperationType.DELETE)
+                .position(1)
+                .version(1)
+                .build();
+
+        OperationMessage incoming = OperationMessage.builder()
+                .operation(OperationType.DELETE)
+                .position(1)
+                .version(0)
+                .build();
+
+        service.transform(incoming, applied);
+
+        assertThat(incoming.getPosition()).isEqualTo(-1);
+    }
+
     @BeforeEach
     void setUp() {
         service = new OperationTransformService();
