@@ -1,6 +1,7 @@
 package com.cfs.backend.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -69,6 +70,38 @@ class DocumentServiceTest {
 		assertThat(documentService.getDocument("doc-1").getVersion()).isEqualTo(1);
 		assertThat(documentService.getDocument("doc-1").getContent().toString())
 				.isEqualTo("A");
+	}
+
+	@Test
+	void shouldRejectInsertWithNegativePosition() {
+
+		Document document = new Document("doc-1");
+
+		when(recoveryService.recover("doc-1"))
+				.thenReturn(document);
+
+		OperationMessage message = OperationMessage.builder()
+				.documentId("doc-1")
+				.userId("user-1")
+				.operation(OperationType.INSERT)
+				.position(-5)
+				.value("X")
+				.version(0)
+				.build();
+
+		assertThatThrownBy(() ->
+				documentService.processOperation(message)
+		)
+				.isInstanceOf(IllegalArgumentException.class);
+
+		assertThat(document.getContent().toString())
+				.isEmpty();
+
+		assertThat(document.getVersion())
+				.isZero();
+
+		assertThat(document.getHistory())
+				.isEmpty();
 	}
 
 	@Test
