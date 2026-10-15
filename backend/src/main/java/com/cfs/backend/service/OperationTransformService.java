@@ -14,7 +14,7 @@ public class OperationTransformService {
 
 	public void transformInsertAgainstInsert(OperationMessage operationMessage , AppliedOperation appliedOperation)
 	{
-		if (appliedOperation.getPosition()< operationMessage.getPosition()){
+		if (appliedOperation.getPosition() <= operationMessage.getPosition()){
 			operationMessage.setPosition(operationMessage.getPosition()+1);
 		}
 	}

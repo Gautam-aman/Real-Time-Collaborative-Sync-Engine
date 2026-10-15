@@ -18,6 +18,46 @@ class OperationTransformServiceTest {
     }
 
     @Test
+    void shouldShiftWhenAppliedInsertComesBeforeIncoming() {
+
+        AppliedOperation applied = AppliedOperation.builder()
+                .operation(OperationType.INSERT)
+                .position(1)
+                .value("B")
+                .build();
+
+        OperationMessage incoming = OperationMessage.builder()
+                .operation(OperationType.INSERT)
+                .position(3)
+                .value("X")
+                .build();
+
+        service.transform(incoming, applied);
+
+        assertThat(incoming.getPosition()).isEqualTo(4);
+    }
+
+    @Test
+    void shouldNotShiftWhenAppliedInsertComesAfterIncoming() {
+
+        AppliedOperation applied = AppliedOperation.builder()
+                .operation(OperationType.INSERT)
+                .position(4)
+                .value("B")
+                .build();
+
+        OperationMessage incoming = OperationMessage.builder()
+                .operation(OperationType.INSERT)
+                .position(1)
+                .value("X")
+                .build();
+
+        service.transform(incoming, applied);
+
+        assertThat(incoming.getPosition()).isEqualTo(1);
+    }
+
+    @Test
     void shouldShiftConcurrentInsertAtSamePosition() {
 
         AppliedOperation applied = AppliedOperation.builder()
