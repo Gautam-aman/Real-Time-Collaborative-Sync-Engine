@@ -77,6 +77,25 @@ class OperationTransformServiceTest {
         assertThat(incoming.getPosition()).isEqualTo(-1);
     }
 
+    @Test
+    void shouldShiftDeleteLeftAfterEarlierDelete() {
+        AppliedOperation applied = AppliedOperation.builder()
+                .operation(OperationType.DELETE)
+                .position(1)
+                .version(1)
+                .build();
+
+        OperationMessage incoming = OperationMessage.builder()
+                .operation(OperationType.DELETE)
+                .position(3)
+                .version(0)
+                .build();
+
+        service.transform(incoming, applied);
+
+        assertThat(incoming.getPosition()).isEqualTo(2);
+    }
+
     @BeforeEach
     void setUp() {
         service = new OperationTransformService();
