@@ -5,12 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="062bb9aa-8cdb-48b2-aa70-36f02392c8b6" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/cfs/backend/service/DocumentService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/cfs/backend/service/DocumentService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="EmbeddingIndexingInfo">
+    <option name="cachedIndexableFilesCount" value="92" />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -26,6 +29,69 @@
   <component name="KubernetesApiProvider">{
   &quot;isMigrated&quot;: true
 }</component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
+  </component>
+  <component name="NextEditCompletionFeaturesState">
+    <decayedCancelled>
+      <entry key="MS100" value="1.8907133261203897" />
+      <entry key="MS500" value="5.603243825634576" />
+      <entry key="S2" value="14.584109610175027" />
+      <entry key="S5" value="27.22713862763499" />
+      <entry key="S10" value="39.11890445175278" />
+      <entry key="S30" value="53.44153364338485" />
+      <entry key="S60" value="58.360177512368075" />
+      <entry key="M2" value="61.13673472842625" />
+      <entry key="M5" value="66.25481222989646" />
+      <entry key="M10" value="77.16714542636569" />
+      <entry key="M15" value="85.44380165243027" />
+      <entry key="M30" value="98.46103925486983" />
+      <entry key="H1" value="107.56182129906452" />
+      <entry key="H2" value="112.95408074861271" />
+      <entry key="H4" value="115.89055095841823" />
+      <entry key="D1" value="118.46931733947106" />
+      <entry key="W1" value="118.9238777585045" />
+    </decayedCancelled>
+    <decayedSelected>
+      <entry key="MS100" value="0.0" />
+      <entry key="MS500" value="0.0" />
+      <entry key="S2" value="0.0" />
+      <entry key="S5" value="0.0" />
+      <entry key="S10" value="0.0" />
+      <entry key="S30" value="0.0" />
+      <entry key="S60" value="0.0" />
+      <entry key="M2" value="0.0" />
+      <entry key="M5" value="0.0" />
+      <entry key="M10" value="0.0" />
+      <entry key="M15" value="0.0" />
+      <entry key="M30" value="0.0" />
+      <entry key="H1" value="0.0" />
+      <entry key="H2" value="0.0" />
+      <entry key="H4" value="0.0" />
+      <entry key="D1" value="0.0" />
+      <entry key="W1" value="0.0" />
+    </decayedSelected>
+    <decayedShown>
+      <entry key="MS100" value="1.8214360600163653" />
+      <entry key="MS500" value="5.56487988953845" />
+      <entry key="S2" value="14.557929796404254" />
+      <entry key="S5" value="27.20603664176756" />
+      <entry key="S10" value="39.10290423508928" />
+      <entry key="S30" value="53.43389077166821" />
+      <entry key="S60" value="58.35594851729315" />
+      <entry key="M2" value="61.134504679496835" />
+      <entry key="M5" value="66.25384670286701" />
+      <entry key="M10" value="77.16658987429393" />
+      <entry key="M15" value="85.44339476636424" />
+      <entry key="M30" value="98.46080715516399" />
+      <entry key="H1" value="107.56169524164038" />
+      <entry key="H2" value="112.95401475619887" />
+      <entry key="H4" value="115.89051715536063" />
+      <entry key="D1" value="118.46931158754404" />
+      <entry key="W1" value="118.92387693382724" />
+    </decayedShown>
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 5
 }</component>
@@ -39,6 +105,7 @@
     "Maven.backend [clean].executor": "Run",
     "Maven.backend [install].executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.MCP Project settings loaded": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager": "true",
     "RunOnceActivity.git.unshallow": "true",
@@ -46,7 +113,7 @@
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "Spring Boot.BackendApplication.executor": "Run",
     "codeWithMe.voiceChat.enabledByDefault": "false",
-    "git-widget-placeholder": "improve/document-validation",
+    "git-widget-placeholder": "fix/concurrent-insert-conflict",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "/Users/rigelsmacbook/Java Projects/sync-engine",
     "node.js.detected.package.eslint": "true",
