@@ -23,6 +23,12 @@ public class OperationTransformService {
 
 	public void transform(OperationMessage incoming, AppliedOperation applied){
 
+		if (incoming.getOperation() == OperationType.DELETE
+				&& incoming.getPosition() != null
+				&& incoming.getPosition() == -1) {
+			return;
+		}
+
 		if(incoming.getOperation() == OperationType.INSERT && applied.getOperation() == OperationType.INSERT){
 			transformInsertAgainstInsert(incoming, applied);
 		}
@@ -47,7 +53,7 @@ public class OperationTransformService {
 	}
 
 	public void transformDeleteAgainstInsert(OperationMessage incoming, AppliedOperation applied){
-		if (applied.getPosition() < incoming.getPosition()){
+		if (applied.getPosition() <= incoming.getPosition()){
 			int insertedLength = applied.getValue().length();
 			incoming.setPosition(incoming.getPosition() + insertedLength);
 			//incoming.setPosition(incoming.getPosition()+1);
