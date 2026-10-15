@@ -115,6 +115,37 @@ class OperationTransformServiceTest {
         assertThat(incoming.getPosition()).isEqualTo(1);
     }
 
+    @Test
+    void shouldPreserveNoopDeleteAcrossLaterTransforms() {
+
+        OperationMessage incoming = OperationMessage.builder()
+                .operation(OperationType.DELETE)
+                .position(1)
+                .version(0)
+                .build();
+
+        AppliedOperation firstDelete = AppliedOperation.builder()
+                .operation(OperationType.DELETE)
+                .position(1)
+                .version(1)
+                .build();
+
+        AppliedOperation laterInsert = AppliedOperation.builder()
+                .operation(OperationType.INSERT)
+                .position(0)
+                .value("XYZ")
+                .version(2)
+                .build();
+
+        service.transform(incoming, firstDelete);
+
+        assertThat(incoming.getPosition()).isEqualTo(-1);
+
+        service.transform(incoming, laterInsert);
+
+        assertThat(incoming.getPosition()).isEqualTo(-1);
+    }
+
     @BeforeEach
     void setUp() {
         service = new OperationTransformService();
