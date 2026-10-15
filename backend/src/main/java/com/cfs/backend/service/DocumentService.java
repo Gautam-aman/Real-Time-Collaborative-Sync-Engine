@@ -80,9 +80,16 @@ public class DocumentService {
 	}
 
 	public OperationResult processOperation(OperationMessage message) {
+		validateIncomingOperation(message);
+
 		Document document = getDocument(message.getDocumentId());
 		synchronized (document){
 
+			if (message.getVersion() > document.getVersion()) {
+				throw new IllegalArgumentException(
+						"Client version is ahead of server version"
+				);
+			}
 
 			if (message.getVersion() < document.getVersion()) {
 				for(AppliedOperation it : document.getHistory()){
@@ -92,7 +99,7 @@ public class DocumentService {
 				}
 			}
 
-			if(message.getPosition() == -1){
+			if(message.getPosition() == -1 && message.getOperation() == OperationType.DELETE){
 				return OperationResult.builder()
 						.documentId(message.getDocumentId())
 						.version(document.getVersion())
@@ -100,20 +107,26 @@ public class DocumentService {
 			}
 
 			StringBuilder content = document.getContent();
-
+			int position = message.getPosition();
 			if (message.getOperation() == OperationType.INSERT) {
-				content.insert(
-					Math.min(message.getPosition() , content.length()) ,
-					message.getValue()
-				);
+				if (position < 0 || position > content.length()) {
+					throw new IllegalArgumentException(
+							"Insert position is outside document bounds"
+					);
+				}
+			} else if (message.getOperation() == OperationType.DELETE) {
+				if (position < 0 || position >= content.length()) {
+					throw new IllegalArgumentException(
+							"Delete position is outside document bounds"
+					);
+				}
 			}
 
-			if (message.getOperation() == OperationType.DELETE) {
-				if (!content.isEmpty() &&
-				message.getPosition()
-								< content.length()) {
-					content.deleteCharAt(message.getPosition());
-				}
+			if (message.getOperation() == OperationType.INSERT) {
+				content.insert(position, message.getValue());
+
+			} else if (message.getOperation() == OperationType.DELETE) {
+				content.deleteCharAt(position);
 			}
 
 			logOwnership(message.getDocumentId());
@@ -166,6 +179,40 @@ public class DocumentService {
 				);
 		System.out.println("Document " + documentId + " owned by " + owner.getNodeId()
 		);
+	}
+
+	private void validateIncomingOperation(OperationMessage message) {
+
+		if (message.getOperation() == null) {
+			throw new IllegalArgumentException(
+					"Operation type is required"
+			);
+		}
+
+		if (message.getPosition() == null) {
+			throw new IllegalArgumentException(
+					"Operation position is required"
+			);
+		}
+
+		if (message.getPosition() < 0) {
+			throw new IllegalArgumentException(
+					"Operation position cannot be negative"
+			);
+		}
+
+		if (message.getVersion() < 0) {
+			throw new IllegalArgumentException(
+					"Document version cannot be negative"
+			);
+		}
+
+		if (message.getOperation() == OperationType.INSERT
+				&& message.getValue() == null) {
+			throw new IllegalArgumentException(
+					"Insert value is required"
+			);
+		}
 	}
 
 }
