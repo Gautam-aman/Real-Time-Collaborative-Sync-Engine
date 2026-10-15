@@ -146,6 +146,35 @@ class OperationTransformServiceTest {
         assertThat(incoming.getPosition()).isEqualTo(-1);
     }
 
+    @Test
+    void shouldTransformOperationAcrossMultipleHistoryEntries() {
+
+        OperationMessage incoming = OperationMessage.builder()
+                .operation(OperationType.DELETE)
+                .position(1)
+                .version(0)
+                .build();
+
+        AppliedOperation first = AppliedOperation.builder()
+                .operation(OperationType.INSERT)
+                .position(1)
+                .value("XYZ")
+                .version(1)
+                .build();
+
+        AppliedOperation second = AppliedOperation.builder()
+                .operation(OperationType.INSERT)
+                .position(2)
+                .value("!")
+                .version(2)
+                .build();
+
+        service.transform(incoming, first);
+        service.transform(incoming, second);
+
+        assertThat(incoming.getPosition()).isEqualTo(5);
+    }
+
     @BeforeEach
     void setUp() {
         service = new OperationTransformService();
