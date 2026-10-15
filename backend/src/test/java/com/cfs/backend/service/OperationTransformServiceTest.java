@@ -10,6 +10,31 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class OperationTransformServiceTest {
 
+    @Test
+    void shouldShiftByInsertedTextLength() {
+
+        AppliedOperation applied = AppliedOperation.builder()
+                .version(1)
+                .operation(OperationType.INSERT)
+                .position(1)
+                .value("XYZ")
+                .userId("user-A")
+                .build();
+
+        OperationMessage incoming = OperationMessage.builder()
+                .documentId("doc-1")
+                .userId("user-B")
+                .operation(OperationType.INSERT)
+                .position(3)
+                .value("!")
+                .version(0)
+                .build();
+
+        service.transform(incoming, applied);
+
+        assertThat(incoming.getPosition()).isEqualTo(6);
+    }
+
     private OperationTransformService service;
 
     @BeforeEach
