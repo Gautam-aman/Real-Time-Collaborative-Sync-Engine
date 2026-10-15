@@ -105,6 +105,60 @@ class DocumentServiceTest {
 	}
 
 	@Test
+	void shouldRejectInsertBeyondDocumentLength() {
+
+		Document document = new Document("doc-1");
+		document.getContent().append("HELLO");
+
+		when(recoveryService.recover("doc-1"))
+				.thenReturn(document);
+
+		OperationMessage message = OperationMessage.builder()
+				.documentId("doc-1")
+				.userId("user-1")
+				.operation(OperationType.INSERT)
+				.position(100)
+				.value("X")
+				.version(0)
+				.build();
+
+		assertThatThrownBy(() ->
+				documentService.processOperation(message)
+		).isInstanceOf(IllegalArgumentException.class);
+
+		assertThat(document.getContent().toString())
+				.isEqualTo("HELLO");
+
+		assertThat(document.getVersion())
+				.isZero();
+	}
+
+	@Test
+	void shouldRejectFutureDocumentVersion() {
+
+		Document document = new Document("doc-1");
+
+		when(recoveryService.recover("doc-1"))
+				.thenReturn(document);
+
+		OperationMessage message = OperationMessage.builder()
+				.documentId("doc-1")
+				.userId("user-1")
+				.operation(OperationType.INSERT)
+				.position(0)
+				.value("X")
+				.version(10)
+				.build();
+
+		assertThatThrownBy(() ->
+				documentService.processOperation(message)
+		).isInstanceOf(IllegalArgumentException.class);
+
+		assertThat(document.getVersion()).isZero();
+		assertThat(document.getContent().toString()).isEmpty();
+	}
+
+	@Test
 	void loadDocumentUsesRecoveredStateWithoutDuplicatingSnapshotContent() {
 		Document recovered = new Document("doc-1");
 		recovered.getContent().append("hello");
