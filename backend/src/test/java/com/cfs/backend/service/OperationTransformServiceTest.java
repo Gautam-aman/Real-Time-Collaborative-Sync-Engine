@@ -10,6 +10,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class OperationTransformServiceTest {
 
+    private OperationTransformService service;
+
     @Test
     void shouldShiftByInsertedTextLength() {
 
@@ -35,7 +37,26 @@ class OperationTransformServiceTest {
         assertThat(incoming.getPosition()).isEqualTo(6);
     }
 
-    private OperationTransformService service;
+    @Test
+    void shouldShiftDeleteAfterMultiCharacterInsert() {
+
+        AppliedOperation applied = AppliedOperation.builder()
+                .version(1)
+                .operation(OperationType.INSERT)
+                .position(1)
+                .value("XYZ")
+                .build();
+
+        OperationMessage incoming = OperationMessage.builder()
+                .operation(OperationType.DELETE)
+                .position(2)
+                .version(0)
+                .build();
+
+        service.transform(incoming, applied);
+
+        assertThat(incoming.getPosition()).isEqualTo(5);
+    }
 
     @BeforeEach
     void setUp() {
